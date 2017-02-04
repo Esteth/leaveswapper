@@ -53,7 +53,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 var rootTemplate = template.Must(template.New("root").Parse(`
 <html>
   <head>
-    <title>Rooty</title>
+    <title>Profile</title>
   </head>
   <body>
     <h1>{{.Email}}</h1>
