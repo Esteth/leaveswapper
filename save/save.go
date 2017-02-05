@@ -11,7 +11,11 @@ import (
 	"google.golang.org/appengine/datastore"
 )
 
-func Save(w http.ResponseWriter, r *http.Request) {
+func RegisterHandlers() {
+	http.HandleFunc("/save", save)
+}
+
+func save(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
 	user := model.User{

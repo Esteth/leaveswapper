@@ -16,8 +16,8 @@ import (
 // Run is the main handler function.
 func Run() {
 	http.HandleFunc("/", root)
-	http.HandleFunc("/save", save.Save)
-	http.HandleFunc("/sell", sell.Sell)
+	save.RegisterHandlers()
+	sell.RegisterHandlers()
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
