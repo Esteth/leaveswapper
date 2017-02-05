@@ -1,8 +1,8 @@
-package leaveswapper
+package sell
 
 import "net/http"
 
-func sell(w http.ResponseWriter, r *http.Request) {
+func Sell(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		get(w, r)
 	} else if r.Method == "POST" {
