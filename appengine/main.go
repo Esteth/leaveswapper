@@ -1,7 +1,24 @@
 package appengine
 
-import "github.com/esteth/leaveswapper"
+import (
+	"net/http"
+
+	"google.golang.org/appengine"
+
+	"github.com/esteth/leaveswapper"
+	"github.com/go-martini/martini"
+)
 
 func init() {
-	leaveswapper.Run()
+	m := martini.Classic()
+
+	m.Use(appEngine)
+
+	leaveswapper.Init(m)
+
+	http.Handle("/", m)
+}
+
+func appEngine(c martini.Context, r *http.Request) {
+	c.Map(appengine.NewContext(r))
 }

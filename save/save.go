@@ -1,23 +1,21 @@
 package save
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	"github.com/esteth/leaveswapper/model"
-	"github.com/esteth/leaveswapper/utils"
 
-	"google.golang.org/appengine"
+	"github.com/go-martini/martini"
 	"google.golang.org/appengine/datastore"
 )
 
-func RegisterHandlers() {
-	http.HandleFunc("/save", save)
+func Init(m martini.Router) {
+	m.Get("/save", save)
 }
 
-func save(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
-
+func save(ctx context.Context) (int, string) {
 	user := model.User{
 		Email: "adam.copp@gmail.com",
 		Selling: []time.Time{
@@ -29,7 +27,8 @@ func save(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err := datastore.Put(ctx, datastore.NewIncompleteKey(ctx, "User", nil), &user)
-	if utils.HandleErr(err, w) {
-		return
+	if err != nil {
+		return http.StatusInternalServerError, err.Error()
 	}
+	return http.StatusOK, "Saved new user!"
 }

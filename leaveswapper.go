@@ -9,15 +9,16 @@ import (
 	"github.com/esteth/leaveswapper/sell"
 	"github.com/esteth/leaveswapper/utils"
 
+	"github.com/go-martini/martini"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
 
-// Run is the main handler function.
-func Run() {
-	http.HandleFunc("/", root)
-	save.RegisterHandlers()
-	sell.RegisterHandlers()
+// Init is the main handler function.
+func Init(m martini.Router) {
+	m.Get("/", root)
+	save.Init(m)
+	sell.Init(m)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
