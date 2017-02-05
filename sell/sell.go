@@ -6,26 +6,41 @@ import (
 
 func RegisterHandlers() {
 	http.HandleFunc("/sell", sell)
+	http.HandleFunc("/sell/:date", sellDate)
 }
 
 func sell(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		get(w, r)
+		getSales(w, r)
 	} else if r.Method == "POST" {
-		post(w, r)
-	} else if r.Method == "DELETE" {
-		delete(w, r)
+		postNewSale(w, r)
+	} else {
+		http.Error(w, "", http.StatusMethodNotAllowed)
 	}
 }
 
-func get(w http.ResponseWriter, r *http.Request) {
+func sellDate(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		getSale(w, r)
+	} else if r.Method == "DELETE" {
+		deleteSale(w, r)
+	} else {
+		http.Error(w, "", http.StatusMethodNotAllowed)
+	}
+}
+
+func getSales(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func post(w http.ResponseWriter, r *http.Request) {
+func getSale(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func delete(w http.ResponseWriter, r *http.Request) {
+func postNewSale(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func deleteSale(w http.ResponseWriter, r *http.Request) {
 
 }
