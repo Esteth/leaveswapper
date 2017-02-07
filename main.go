@@ -16,9 +16,7 @@ func init() {
 
 	m.Get("/", root)
 	m.Get("/save", save)
-	m.Get("/sell", getSales)
 	m.Post("/sell", postNewSale)
-	m.Get("/sell/:date", getSale)
 
 	http.Handle("/", m)
 }

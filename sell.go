@@ -14,14 +14,6 @@ type sale struct {
 	time time.Time
 }
 
-func getSales() {
-
-}
-
-func getSale() {
-
-}
-
 func postNewSale(ctx context.Context, w http.ResponseWriter, r *http.Request) (int, string) {
 	if appengineuser.Current(ctx) == nil {
 		url, err := appengineuser.LoginURL(ctx, "/")
@@ -43,8 +35,4 @@ func postNewSale(ctx context.Context, w http.ResponseWriter, r *http.Request) (i
 	}
 
 	return 200, "Success"
-}
-
-func deleteSale(w http.ResponseWriter, r *http.Request) {
-
 }
