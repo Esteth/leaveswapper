@@ -18,13 +18,24 @@ type sale struct {
 func postNewSale(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	date := r.Form["date"]
+	if date == nil {
+		http.Error(w, "Must set date"+r.Form.Encode(), http.StatusBadRequest)
+		return
+	}
+
 	if appengineuser.Current(ctx) == nil {
 		url, err := appengineuser.LoginURL(ctx, "/")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+		http.Redirect(w, r, url, http.StatusSeeOther)
 		return
 	}
 
@@ -34,7 +45,7 @@ func postNewSale(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var newSale sale
-	err := json.NewDecoder(r.Body).Decode(&newSale)
+	err = json.NewDecoder(r.Body).Decode(&newSale)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
