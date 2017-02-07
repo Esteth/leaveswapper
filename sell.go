@@ -2,37 +2,43 @@ package leaveswapper
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
 	appengineuser "google.golang.org/appengine/user"
 
-	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 )
 
 type sale struct {
 	time time.Time
 }
 
-func postNewSale(ctx context.Context, w http.ResponseWriter, r *http.Request) (int, string) {
+func postNewSale(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+
 	if appengineuser.Current(ctx) == nil {
 		url, err := appengineuser.LoginURL(ctx, "/")
 		if err != nil {
-			return http.StatusInternalServerError, err.Error()
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-		return http.StatusTemporaryRedirect, ""
+		return
 	}
 
 	if r.Body == nil {
-		return http.StatusBadRequest, "Must send a request body"
+		http.Error(w, "Must send a request body", http.StatusBadRequest)
+		return
 	}
 
 	var newSale sale
 	err := json.NewDecoder(r.Body).Decode(&newSale)
 	if err != nil {
-		return http.StatusInternalServerError, err.Error()
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	return 200, "Success"
+	fmt.Fprintf(w, "Success")
 }

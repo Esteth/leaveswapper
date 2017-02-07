@@ -4,12 +4,14 @@ import (
 	"net/http"
 	"time"
 
-	"golang.org/x/net/context"
+	"fmt"
 
+	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
 
-func save(ctx context.Context) (int, string) {
+func save(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
 	user := user{
 		Email: "adam.copp@gmail.com",
 		Selling: []time.Time{
@@ -22,7 +24,8 @@ func save(ctx context.Context) (int, string) {
 
 	_, err := datastore.Put(ctx, datastore.NewIncompleteKey(ctx, "User", nil), &user)
 	if err != nil {
-		return http.StatusInternalServerError, err.Error()
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	return http.StatusOK, "Saved new user!"
+	fmt.Fprintf(w, "Saved new user!")
 }

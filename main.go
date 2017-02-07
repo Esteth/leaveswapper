@@ -4,42 +4,39 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/go-martini/martini"
+	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
 
 func init() {
-	m := martini.Classic()
+	router := mux.NewRouter()
 
-	m.Use(appEngine)
+	router.HandleFunc("/", root).Methods("GET")
+	router.HandleFunc("/save", save).Methods("GET")
+	router.HandleFunc("/sell", postNewSale).Methods("POST")
 
-	m.Get("/", root)
-	m.Get("/save", save)
-	m.Post("/sell", postNewSale)
-
-	http.Handle("/", m)
+	n := negroni.Classic()
+	n.UseHandler(router)
+	http.Handle("/", n)
 }
 
-func appEngine(c martini.Context, r *http.Request) {
-	c.Map(appengine.NewContext(r))
-}
-
-func root(w http.ResponseWriter, r *http.Request) (int, string) {
+func root(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
 
 	var user user
 	cursor := datastore.NewQuery("User").Run(ctx)
 	_, err := cursor.Next(&user)
 	if err != nil {
-		return http.StatusInternalServerError, err.Error()
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	rootTemplate := template.Must(template.ParseFiles("templates/user.html"))
 	err = rootTemplate.Execute(w, user)
 	if err != nil {
-		return http.StatusInternalServerError, err.Error()
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-
-	return http.StatusOK, ""
 }
