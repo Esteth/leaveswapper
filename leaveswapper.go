@@ -4,11 +4,6 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/esteth/leaveswapper/model"
-	"github.com/esteth/leaveswapper/save"
-	"github.com/esteth/leaveswapper/sell"
-	"github.com/esteth/leaveswapper/utils"
-
 	"github.com/go-martini/martini"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
@@ -17,23 +12,27 @@ import (
 // Init is the main handler function.
 func Init(m martini.Router) {
 	m.Get("/", root)
-	save.Init(m)
-	sell.Init(m)
+	m.Get("/save", save)
+	m.Get("/sell", getSales)
+	m.Post("/sell", postNewSale)
+	m.Get("/sell/:date", getSale)
 }
 
-func root(w http.ResponseWriter, r *http.Request) {
+func root(w http.ResponseWriter, r *http.Request) (int, string) {
 	ctx := appengine.NewContext(r)
 
-	var user model.User
+	var user user
 	cursor := datastore.NewQuery("User").Run(ctx)
 	_, err := cursor.Next(&user)
-	if utils.HandleErr(err, w) {
-		return
+	if err != nil {
+		return http.StatusInternalServerError, err.Error()
 	}
 
 	rootTemplate := template.Must(template.ParseFiles("templates/user.html"))
 	err = rootTemplate.Execute(w, user)
-	if utils.HandleErr(err, w) {
-		return
+	if err != nil {
+		return http.StatusInternalServerError, err.Error()
 	}
+
+	return http.StatusOK, ""
 }

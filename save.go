@@ -1,22 +1,16 @@
-package save
+package leaveswapper
 
 import (
-	"context"
 	"net/http"
 	"time"
 
-	"github.com/esteth/leaveswapper/model"
+	"golang.org/x/net/context"
 
-	"github.com/go-martini/martini"
 	"google.golang.org/appengine/datastore"
 )
 
-func Init(m martini.Router) {
-	m.Get("/save", save)
-}
-
 func save(ctx context.Context) (int, string) {
-	user := model.User{
+	user := user{
 		Email: "adam.copp@gmail.com",
 		Selling: []time.Time{
 			time.Date(2017, 8, 12, 0, 0, 0, 0, time.UTC),
