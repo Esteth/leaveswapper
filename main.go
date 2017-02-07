@@ -9,13 +9,22 @@ import (
 	"google.golang.org/appengine/datastore"
 )
 
-// Init is the main handler function.
-func Init(m martini.Router) {
+func init() {
+	m := martini.Classic()
+
+	m.Use(appEngine)
+
 	m.Get("/", root)
 	m.Get("/save", save)
 	m.Get("/sell", getSales)
 	m.Post("/sell", postNewSale)
 	m.Get("/sell/:date", getSale)
+
+	http.Handle("/", m)
+}
+
+func appEngine(c martini.Context, r *http.Request) {
+	c.Map(appengine.NewContext(r))
 }
 
 func root(w http.ResponseWriter, r *http.Request) (int, string) {
