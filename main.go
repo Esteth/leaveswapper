@@ -1,39 +1,23 @@
 package leaveswapper
 
 import (
-	"html/template"
 	"net/http"
 
+	"fmt"
+
 	"github.com/pressly/chi"
-	"google.golang.org/appengine"
-	"google.golang.org/appengine/datastore"
+	"github.com/pressly/chi/middleware"
 )
 
-func init() {
+// Serves the api on the given address.
+func ListenAndServe(addr string) {
 	r := chi.NewRouter()
 
-	r.Get("/", root)
-	r.Get("/save", save)
-	r.Post("/sell", postNewSale)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
 
-	http.Handle("/", r)
-}
+	r.Mount("/orders", ordersResource{}.routes())
 
-func root(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
-
-	var user user
-	cursor := datastore.NewQuery("User").Run(ctx)
-	_, err := cursor.Next(&user)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	rootTemplate := template.Must(template.ParseFiles("templates/user.html"))
-	err = rootTemplate.Execute(w, user)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	fmt.Printf("Now listening on %s\n", addr)
+	http.ListenAndServe(addr, r)
 }
