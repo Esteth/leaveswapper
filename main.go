@@ -4,22 +4,19 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/gorilla/mux"
-	"github.com/urfave/negroni"
+	"github.com/pressly/chi"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 )
 
 func init() {
-	router := mux.NewRouter()
+	r := chi.NewRouter()
 
-	router.HandleFunc("/", root).Methods("GET")
-	router.HandleFunc("/save", save).Methods("GET")
-	router.HandleFunc("/sell", postNewSale).Methods("POST")
+	r.Get("/", root)
+	r.Get("/save", save)
+	r.Post("/sell", postNewSale)
 
-	n := negroni.Classic()
-	n.UseHandler(router)
-	http.Handle("/", n)
+	http.Handle("/", r)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
