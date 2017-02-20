@@ -1,0 +1,7 @@
+package: github.com/esteth/leaveswapper
+import:
+- package: github.com/pressly/chi
+  version: ^2.0.0
+  subpackages:
+  - middleware
+- package: github.com/unrolled/render

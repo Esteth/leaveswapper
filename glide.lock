@@ -1,0 +1,10 @@
+hash: 6b899878a72e6936198607978bf35b2eaa32bc6e8cdca5875157c26463cc98b4
+updated: 2017-02-20T19:06:58.170492097Z
+imports:
+- name: github.com/pressly/chi
+  version: 54f435d539226571eab1987ed862b1c0fdfdc892
+  subpackages:
+  - middleware
+- name: github.com/unrolled/render
+  version: 50716a0a853771bb36bfce61a45cdefdb98c2e6e
+testImports: []
