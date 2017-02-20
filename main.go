@@ -1,7 +1,15 @@
 package main
 
 import "github.com/esteth/leaveswapper/app"
+import "os"
+import "log"
 
 func main() {
-	app.ListenAndServe(":8080")
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
+
+	app.ListenAndServe(":" + port)
 }
