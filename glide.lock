@@ -1,6 +1,14 @@
 hash: 6b899878a72e6936198607978bf35b2eaa32bc6e8cdca5875157c26463cc98b4
-updated: 2017-02-20T19:06:58.170492097Z
+updated: 2017-02-26T01:12:03.849708108Z
 imports:
+- name: github.com/jmoiron/sqlx
+  version: f4076845477b10ac2453a16377a8383467aafe72
+  subpackages:
+  - reflectx
+- name: github.com/lib/pq
+  version: ba5d4f7a35561e22fbdf7a39aa0070f4d460cfc0
+  subpackages:
+  - oid
 - name: github.com/pressly/chi
   version: 54f435d539226571eab1987ed862b1c0fdfdc892
   subpackages:
