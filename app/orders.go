@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -27,7 +28,8 @@ func (rs ordersResource) routes() chi.Router {
 	r.Post("/", rs.create)
 	r.Put("/", rs.delete)
 
-	r.Route("/:id", func(r chi.Router) {
+	r.Route("/:date", func(r chi.Router) {
+		r.Use(orderContext(rs.db))
 		r.Get("/", rs.get)
 		r.Put("/", rs.update)
 		r.Delete("/", rs.delete)
@@ -36,14 +38,45 @@ func (rs ordersResource) routes() chi.Router {
 	return r
 }
 
+func orderContext(db *sqlx.DB) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			date := chi.URLParam(r, "date")
+			order := order{}
+			err := db.Get(&order,
+				db.Rebind(
+					`SELECT
+					  *
+					FROM
+					  orders
+					WHERE 
+					  type = 'sell' 
+						AND user_id = ?
+						AND date = ?
+					LIMIT 1`),
+				"adam.copp@gmail.com",
+				date)
+			if err != nil {
+				http.Error(w, http.StatusText(404), 404)
+				return
+			}
+			ctx := context.WithValue(r.Context(), "order", order)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
 func (rs ordersResource) list(w http.ResponseWriter, r *http.Request) {
 	orders := []order{}
 	err := rs.db.Select(&orders,
 		rs.db.Rebind(
-			`SELECT *
-			 FROM orders
-			 WHERE type = 'sell' 
-         AND user_id = ?`),
+			`SELECT
+			  *
+			FROM
+			  orders
+			WHERE 
+			  type = 'sell'
+        AND user_id = ?`),
 		"adam.copp@gmail.com")
 	if err != nil {
 		panic(err)
@@ -52,18 +85,7 @@ func (rs ordersResource) list(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rs ordersResource) get(w http.ResponseWriter, r *http.Request) {
-	order := order{}
-	err := rs.db.Get(&order,
-		rs.db.Rebind(
-			`SELECT *
-			 FROM orders
-			 WHERE type = 'sell' 
-         AND user_id = ?
-			 LIMIT 1`),
-		"adam.copp@gmail.com")
-	if err != nil {
-		panic(err)
-	}
+	order := r.Context().Value("order")
 	rs.rendr.JSON(w, http.StatusOK, order)
 }
 
